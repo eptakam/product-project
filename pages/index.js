@@ -23,8 +23,10 @@ export default function HomePage(props) {
 }
 
 // faire un static generation avant que ce composant soit rendu pour justement avoir les données avant le rendu car contrairement a l'approche 'App Router' dans laquelle les composant sont des 'server components' et donc les données sont chargées au moment du rendu, avec l'appproche 'Pages Router', il faut dire a next.js de faire un 'static generation' avant le rendu du composant pour avoir les données avant le rendu.
-// ceci sera execute seulement au moment de la generation de la page
-// elle peut prendre un parametre 'context' qui contient des informations sur la requete
+// ceci sera execute seulement au moment de la generation de la page 
+// *** Important: *** getStaticProps() n'est pas appelee pour la requete actuelle (entrante) mais generalement lors de la generation de la page. Elle n'a pas aussi acces aux donnees de la requete actuelle (entrante)
+// donc pour pre-render une page pour chaque requete actuelle (entrante), nous avons besoin de getServerSideProps() qui est une function dans laquelle nous mettrons un 'real server-side code' et qui est execute a chaque requete
+// getStaticProps peut prendre un parametre 'context' qui contient des informations sur la requete
 export async function getStaticProps(context) {
   // Note: vu que getStaticProps est exécuté côté serveur, on peut lire directement des fichiers system (cote serveur) avec fs etant dans notre composant sans avoir besoin de les importer
   // fs.readFileSync() lit le contenu d'un fichier
