@@ -18,6 +18,16 @@ export default function ProductDetailPage(props) {
   );
 }
 
+// dans la realite, nous n'allons pas harcoder les id comme nous l'avons fait dans getStaticProps. mais plustot nous les fetcherons de la bd. 
+async function getData() {
+  
+  const filePath = path.join(process.cwd(), 'data', 'dummy-backend.json');
+  const jsonData = await fs.readFile(filePath);
+  const data = JSON.parse(jsonData);
+
+  return data;
+}
+
 // nous allons utiliser getStaticProps pour charger les données de la page. sauf que cette fois nous ne chargerons qu'un seul produit a la fois en fonction de l'id du produit. nous nous servirons du parametre 'context' pour recuperer l'id du produit
 // Attention: lorsqu'on a un segment dynamique comme c'est notre cas, ne pas perdre de vue que getStaticProps ne fera pas le pre-rendering des pages. Car il ne saura pas a l'avance les valeurs des segments dynamiques. 
 // Solution: Il faudra donc utiliser getStaticPaths pour lui donner les valeurs des segments dynamiques 
@@ -26,9 +36,7 @@ export async function getStaticProps(context){
   const productId = params.pid;   // pid est le nom du parametre dynamique du dossier [pid]
   // [pid] sera le segment apres le localhost:3000/ dans l'url. ex: pour localhost:3000/1, pid sera 1
 
-  const filePath = path.join(process.cwd(), 'data', 'dummy-backend.json');
-  const jsonData = await fs.readFile(filePath);
-  const data = JSON.parse(jsonData);
+  const data = await getData();
 
   // filtrer le produit dont l'id est egal a productId
   const product = data.products.find(product => product.id === productId);
@@ -42,18 +50,25 @@ export async function getStaticProps(context){
 
 // getStaticPaths est une fonction qui permet de dire a next.js quels sont les segments dynamiques que nous avons dans notre page pour qu'il puisse les pre-render
 export async function getStaticPaths(){
-  const filePath = path.join(process.cwd(), 'data', 'dummy-backend.json');
-  const jsonData = await fs
+  const data = await getData();
+
+  // recuperer les ids des produits et les mettre dans un tableau
+  const ids = data.products.map(product => product.id);
+
+  // transformer les ids en tableau d'objet pour les passer a la cle 'paths' de l'objet retourne par getStaticPaths
+  const pathsWithParams = ids.map((id) => ({ params: { pid: id } }));
 
   return {
-    paths: [
-      {params: {pid: 'p1'}},
-      {params: {pid: 'p2'}},
-      {params: {pid: 'p3'}},
-    ],
-    // fallback: false   
+    // paths: tableau d'objets contenant les ids des produits
+    paths: pathsWithParams,
+    // paths: [
+    //   {params: {pid: 'p1'}},
+    //   {params: {pid: 'p2'}},
+    //   {params: {pid: 'p3'}},
+    // ],
+    fallback: false   
     // fallback: true 
-    fallback: 'blocking'
+    // fallback: 'blocking'
     
     /*
       le 'fallback' key est important lorsqu'on a plusieurs pages dynamiques
