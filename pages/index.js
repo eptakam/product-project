@@ -1,6 +1,7 @@
-import path from 'path';  // path est un module node.js qui permet de manipuler des chemins de fichiers
-import fs from 'fs/promises';  // fs (file system) est un module node.js qui permet de lire des fichiers cote serveur
-import { notFound } from 'next/navigation';
+import path from "path"; // path est un module node.js qui permet de manipuler des chemins de fichiers
+import fs from "fs/promises"; // fs (file system) est un module node.js qui permet de lire des fichiers cote serveur
+import Link from "next/link";
+import { notFound } from "next/navigation";
 
 export default function HomePage(props) {
   const { products } = props;
@@ -13,7 +14,9 @@ export default function HomePage(props) {
   return (
     <ul>
       {products.map((product) => (
-        <li key={product.id}>{product.title}</li>
+        <li key={product.id}>
+          <Link href={`/${product.id}`}>{product.title}</Link>
+        </li>
       ))}
     </ul>
   );
@@ -26,27 +29,27 @@ export async function getStaticProps(context) {
   // Note: vu que getStaticProps est exécuté côté serveur, on peut lire directement des fichiers system (cote serveur) avec fs etant dans notre composant sans avoir besoin de les importer
   // fs.readFileSync() lit le contenu d'un fichier
   // cwd (current working directory) est le répertoire de travail courant
-  const filePath = path.join(process.cwd(), 'data', 'dummy-backend.json');
+  const filePath = path.join(process.cwd(), "data", "dummy-backend.json");
   const jsonData = await fs.readFile(filePath);
-  const data = JSON.parse(jsonData);  // JSON.parse() convertit une chaîne JSON en objet JavaScript
+  const data = JSON.parse(jsonData); // JSON.parse() convertit une chaîne JSON en objet JavaScript
 
-  if(!data) {
+  if (!data) {
     return {
       redirect: {
-        destination: '/no-data'
-      }
-    }
+        destination: "/no-data",
+      },
+    };
   }
 
   if (data.products.length === 0) {
-    return { notFound: true };  // si le tableau de produits est vide, renvoyer une page 404
+    return { notFound: true }; // si le tableau de produits est vide, renvoyer une page 404
   }
 
   return {
     props: {
-      products: data.products,  // data est un objet qui contient un tableau de produits
+      products: data.products, // data est un objet qui contient un tableau de produits
     },
-    revalidate: 10,  // revalidate est une option qui permet de regénérer la page après 10 secondes. c'est ce qu'on appelle l'incremental static regeneration (ISR)
+    revalidate: 10, // revalidate est une option qui permet de regénérer la page après 10 secondes. c'est ce qu'on appelle l'incremental static regeneration (ISR)
     //notFound: true,  // notFound est une option qui permet de renvoyer une page 404 si les données ne sont pas trouvées
     //redirect: {  // redirect est une option qui permet de rediriger l'utilisateur vers une autre page si les données ne sont pas trouvées
   };
