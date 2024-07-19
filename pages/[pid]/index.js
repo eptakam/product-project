@@ -5,10 +5,10 @@ import { Fragment } from "react";
 export default function ProductDetailPage(props) {
   const { loadedProduct } = props;
 
-  // si loadedProduct n'est pas encore chargé, afficher un loader
-  // if (!loadedProduct) {
-  //   return <p>Loading...</p>;
-  // }
+  // si loadedProduct n'est pas encore chargé, afficher un loader -> ceci est necessaire si fallback est true
+  if (!loadedProduct) {
+    return <p>Loading...</p>;
+  }
 
   return (
     <Fragment>
@@ -41,6 +41,11 @@ export async function getStaticProps(context){
   // filtrer le produit dont l'id est egal a productId
   const product = data.products.find(product => product.id === productId);
 
+  // le produit n'existe pas et fallback est true
+  if(!product){
+    return { notFound: true };
+  }
+
   return {
     props: {
       loadedProduct: product
@@ -66,8 +71,8 @@ export async function getStaticPaths(){
     //   {params: {pid: 'p2'}},
     //   {params: {pid: 'p3'}},
     // ],
-    fallback: false   
-    // fallback: true 
+    // fallback: false   
+    fallback: true 
     // fallback: 'blocking'
     
     /*
