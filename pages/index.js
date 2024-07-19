@@ -32,5 +32,6 @@ export async function getStaticProps() {
     props: {
       products: data.products,  // data est un objet qui contient un tableau de produits
     },
+    revalidate: 10,  // revalidate est une option qui permet de regénérer la page après 10 secondes. c'est ce qu'on appelle l'incremental static regeneration (ISR)
   };
 }
