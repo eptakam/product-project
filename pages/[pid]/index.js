@@ -5,6 +5,11 @@ import { Fragment } from "react";
 export default function ProductDetailPage(props) {
   const { loadedProduct } = props;
 
+  // si loadedProduct n'est pas encore chargé, afficher un loader
+  // if (!loadedProduct) {
+  //   return <p>Loading...</p>;
+  // }
+
   return (
     <Fragment>
       <h1>{loadedProduct.title}</h1>
@@ -46,6 +51,18 @@ export async function getStaticPaths(){
       {params: {pid: 'p2'}},
       {params: {pid: 'p3'}},
     ],
-    fallback: false   // fallback est une option qui permet de dire a next.js de renvoyer une page 404 si le segment dynamique n'est pas trouvé
+    // fallback: false   
+    // fallback: true 
+    fallback: 'blocking'
+    
+    /*
+      le 'fallback' key est important lorsqu'on a plusieurs pages dynamiques
+
+      - on peut le setter a 'true' pour ne pre-render que quelques pages dynamiques et laisser les autres a la demande. dans ce cas, seules les pages listees dans 'paths' seront pre-render (pages beaucoup visitees) et les autres seront pre-render a la demande
+
+      - Attention: si on met 'fallback' a 'true', on doit retourner son etat a notre composant pour qu'il sache que la page est en cours de pre-render et qu'il doit afficher un loader en attendant que la page soit pre-render pour eviter les erreurs (voir exemple ci-dessus)
+
+      - on peut le setter a 'blocking'. dans ce cas, on a plus besoin de retourner l'etat de 'fallback' a notre composant car next.js attendra que toutes les pages soient pre-render avant de les afficher. c'est le meme comportement que 'true' sauf que les pages seront pre-render avant d'etre affichees, ce qui prendra un plus de temps pour afficher la page
+    */
   }
 }
