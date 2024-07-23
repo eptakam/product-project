@@ -8,6 +8,7 @@ export default function LastSalesPage(props) {
   // SWR est une librairie qui permet de fetcher des donnees cote client. elle est tres utile pour les donnees qui changent frequemment. elle permet de mettre en cache les donnees et de les mettre a jour automatiquement. pour qu'elle fonctionne, il faut lui passer comme segond argument une fonction fetcher qui prend en parametre l'url a fetcher et qui retourne une promesse.
   // SWR est utilise uniquement dans les composants React et pas dans les fonctions getServerSideProps ou getStaticProps
 
+  // const fetcher = (...args) => fetch(...args).then(res => res.json())
   const fetcher = (url) => fetch(url).then((response) => response.json());
   const { data, error } = useSWR(
     "https://nextjs-course-7cc9a-default-rtdb.firebaseio.com/sales.json",
